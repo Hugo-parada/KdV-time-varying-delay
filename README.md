@@ -6,7 +6,7 @@ MATLAB codes accompanying the numerical simulations in:
 > DOI: https://doi.org/10.1016/j.sysconle.2023.105547  
 > HAL: https://hal.science/hal-03819356v2
 
-The repository contains corrected versions of the MATLAB codes recovered from the original 2022 archive. The organization and function names have deliberately been kept close to the original code instead of replacing it by a new software architecture.
+The repository contains corrected versions of the MATLAB codes recovered from the original 2022 archive. The organization has deliberately been kept close to the original code instead of replacing it by a new software architecture. File names are in English.
 
 ## Repository layout
 
@@ -17,11 +17,11 @@ Boundary feedback with constant or time-varying delay.
 Main files:
 
 - `kdv_time_delay.m`: time-varying boundary delay.
-- `kdv_cte_delay.m`: constant boundary delay.
+- `kdv_constant_delay.m`: constant boundary delay.
 - `mat1.m`: implicit KdV matrix and delayed boundary coupling.
 - `mat2.m`: transport matrix for the time-varying delay.
 - `mat3.m`: transport matrix for the constant delay.
-- `Cases1.m`, `Cases2.m`, `Cases3.m`: the numerical experiments, using the same naming convention as the recovered archive.
+- `Cases1.m`, `Cases2.m`, `Cases3.m`: numerical experiments from the recovered archive.
 
 ### `internal-delay/`
 
@@ -30,13 +30,13 @@ Localized internal feedback with constant or time-varying delay.
 Main files:
 
 - `kdvint_timedelay.m`: time-varying internal delay.
-- `kdvint_ctedelay.m`: constant internal delay.
+- `kdvint_constant_delay.m`: constant internal delay.
 - `MatA.m`: implicit KdV matrix with instantaneous damping.
 - `MatAz.m`: transport matrix for the time-varying memory variable.
-- `MatAz_cte.m`: constant-delay transport matrix.
+- `MatAz_constant.m`: constant-delay transport matrix.
 - `Cases1_int.m`, `Cases3int.m`: experiments from the recovered archive.
 
-The names `mat1`, `mat2`, `MatA`, `MatAz`, `Cases1`, etc. are retained intentionally because they correspond to the way the original numerical work was written.
+The names `mat1`, `mat2`, `MatA`, `MatAz`, `Cases1`, etc. are retained because they stay close to the original numerical work; only non-English abbreviations such as `cte` were replaced.
 
 ## Boundary delayed feedback
 
@@ -166,6 +166,7 @@ or directly
 
 ```matlab
 [t,E]=kdv_time_delay(0.1,0.1,0.2);
+[t,E]=kdv_constant_delay(0.1,0.1,0.2);
 ```
 
 From `internal-delay/`:
@@ -173,6 +174,12 @@ From `internal-delay/`:
 ```matlab
 Cases1_int
 Cases3int
+```
+
+and for a constant internal delay:
+
+```matlab
+[t,E]=kdvint_constant_delay(1.5);
 ```
 
 A short repository-level check is available with
