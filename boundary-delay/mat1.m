@@ -2,7 +2,7 @@ function[A1_1,A1_2]=mat1(Nx,Nrho,dx,dt,alpha,beta)
 % Matrix for the implicit linear KdV part.
  
 Ny=Nx-2;
-a1=1+3*dt/(dx^3);
+a1=1+3*dt/(dx^3); 
 a2=-3*dt/(dx^3)+dt/(2*dx);
 a3=dt/(dx^3);
 a4=-a3-dt/(2*dx);
