@@ -1,6 +1,6 @@
 % Variable delay versus the corresponding minimum and maximum constants
 clear;clc;
-alpha=0.2;
+alpha=0.2; 
 beta=0.2;
 d=0.2;
 
