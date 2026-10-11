@@ -2,7 +2,7 @@ function[t,E]=kdv_constant_delay(alpha,beta,h)
 % Nonlinear KdV with constant delayed boundary feedback.
 
 L=1;
-T=10;
+T=10; 
 y0=@(x) 0.5*(1-cos(2*pi*x));
 z0=@(rho) -0.5*sin(2*pi*rho);
 
