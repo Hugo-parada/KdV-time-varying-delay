@@ -1,6 +1,6 @@
 function[A2_1,A2_2]=mat2(Nx,Nrho,dx,dt,drho,tau,dtau,tnew)
 % Implicit upwind matrix for
-% tau(t)z_t+(1-tau'(t)rho)z_rho=0.
+% tau(t)z_t+(1-tau'(t)rho)z_rho=0. 
 
 Ny=Nx-2;
 rho=(1:Nrho)*drho;
