@@ -2,7 +2,7 @@
 
 MATLAB codes accompanying the numerical simulations in:
 
-> H. Parada, C. Timimoun, and J. Valein, **Stability results for the KdV equation with time-varying delay**, *Systems & Control Letters* **177** (2023), 105547.  
+> H. Parada, C. Timmimoun, and J. Valein, **Stability results for the KdV equation with time-varying delay**, *Systems & Control Letters* **177** (2023), 105547.  
 > DOI: https://doi.org/10.1016/j.sysconle.2023.105547  
 > HAL: https://hal.science/hal-03819356v2
 
