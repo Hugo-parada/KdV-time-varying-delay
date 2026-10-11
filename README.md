@@ -6,8 +6,6 @@ MATLAB codes accompanying the numerical simulations in:
 > DOI: https://doi.org/10.1016/j.sysconle.2023.105547  
 > HAL: https://hal.science/hal-03819356v2
 
-The repository contains corrected versions of the MATLAB codes recovered from the original 2022 archive. The organization has deliberately been kept close to the original code instead of replacing it by a new software architecture. File names are in English.
-
 ## Repository layout
 
 ### `boundary-delay/`
