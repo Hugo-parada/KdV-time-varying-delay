@@ -129,23 +129,4 @@ tau(t)=(M-0.5)+0.5*sin(t),
 
 so `M` is the maximum delay.
 
-`MatAz.m` imposes `z(x,0,t_{n+1})=y(x,t_{n+1})` in the same coupled solve. This removes the one-cell spatial shift and old-time inflow that were present in the recovered implementation.
-
-The memory part of the energy is integrated only on the feedback region and uses `xi=2.1`, as in the analytical model.
-
-## Corrections made to the recovered archive
-
-The corrected code keeps the original style but fixes the numerical inconsistencies found in the 2022 files:
-
-1. The nonlinear term contains the missing factor `1/dx` and is implemented as `y_i D_x^+y_i`.
-2. In `mat2.m`, the first transport row uses the coefficient at `rho_1=drho`; the recovered code accidentally used the final loop index `k=Nrho`.
-3. `tau` and `tau'` are evaluated consistently at the new implicit time level.
-4. The transformed initial histories are evaluated on the actual `rho` grid, without applying the delay a second time.
-5. Boundary energy uses the square of the memory norm, the quadrature factors, and the factor `1/2`.
-6. Constant- and variable-delay simulations use the same physical definition of energy.
-7. `Cases2.m` really uses `d=0.1` for the curve labelled `d=0.1`; the recovered script used `d=0.2` while displaying `0.1`.
-8. The internal memory is aligned with the same spatial point as the KdV unknown; the recovered code used the previous spatial cell.
-9. The internal condition `z(x,0,t)=y(x,t)` is imposed in the coupled linear system rather than by inserting the previous KdV state.
-10. The internal memory energy is restricted to the feedback support and uses `xi=2.1`.
-11. The spurious factor `2` that appeared after the first time step in the constant internal-delay energy is removed.
-12. The parameter used in the internal-delay experiment now agrees with the label `M` in the figure.
+`MatAz.m` imposes `z(x,0,t_{n+1})=y(x,t_{n+1})` in the same coupled solve. 
