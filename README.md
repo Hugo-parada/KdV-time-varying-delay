@@ -34,7 +34,6 @@ Main files:
 - `MatAz_constant.m`: constant-delay transport matrix.
 - `Cases1_int.m`, `Cases3int.m`: experiments from the recovered archive.
 
-The names `mat1`, `mat2`, `MatA`, `MatAz`, `Cases1`, etc. are retained because they stay close to the original numerical work; only non-English abbreviations such as `cte` were replaced.
 
 ## Boundary delayed feedback
 
@@ -150,40 +149,3 @@ The corrected code keeps the original style but fixes the numerical inconsistenc
 10. The internal memory energy is restricted to the feedback support and uses `xi=2.1`.
 11. The spurious factor `2` that appeared after the first time step in the constant internal-delay energy is removed.
 12. The parameter used in the internal-delay experiment now agrees with the label `M` in the figure.
-
-## Running the experiments
-
-From `boundary-delay/`, for example:
-
-```matlab
-Cases2
-Cases3
-```
-
-or directly
-
-```matlab
-[t,E]=kdv_time_delay(0.1,0.1,0.2);
-[t,E]=kdv_constant_delay(0.1,0.1,0.2);
-```
-
-From `internal-delay/`:
-
-```matlab
-Cases1_int
-Cases3int
-```
-
-and for a constant internal delay:
-
-```matlab
-[t,E]=kdvint_constant_delay(1.5);
-```
-
-A short repository-level check is available with
-
-```matlab
-smoke_test
-```
-
-The cleanup environment did not contain MATLAB/Octave, so the final MATLAB execution should still be run locally before regenerating publication-quality figures.
