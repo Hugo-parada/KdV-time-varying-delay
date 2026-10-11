@@ -6,153 +6,179 @@ MATLAB codes accompanying the numerical simulations in:
 > DOI: https://doi.org/10.1016/j.sysconle.2023.105547  
 > HAL: https://hal.science/hal-03819356v2
 
-The repository contains corrected and cleaned versions of the MATLAB codes recovered from the original 2022 simulation archive.
+The repository contains corrected versions of the MATLAB codes recovered from the original 2022 archive. The organization and function names have deliberately been kept close to the original code instead of replacing it by a new software architecture.
 
-## Contents
+## Repository layout
 
-- `boundary-delay/`: nonlinear KdV equation with time-varying or constant delayed boundary feedback.
-- `internal-delay/`: nonlinear KdV equation with time-varying or constant delayed internal feedback.
-- `smoke_test.m`: short consistency test for both solvers.
+### `boundary-delay/`
 
-## Numerical method
+Boundary feedback with constant or time-varying delay.
 
-For the KdV part, the space interval is discretized uniformly. The linear operator
+Main files:
+
+- `kdv_time_delay.m`: time-varying boundary delay.
+- `kdv_cte_delay.m`: constant boundary delay.
+- `mat1.m`: implicit KdV matrix and delayed boundary coupling.
+- `mat2.m`: transport matrix for the time-varying delay.
+- `mat3.m`: transport matrix for the constant delay.
+- `Cases1.m`, `Cases2.m`, `Cases3.m`: the numerical experiments, using the same naming convention as the recovered archive.
+
+### `internal-delay/`
+
+Localized internal feedback with constant or time-varying delay.
+
+Main files:
+
+- `kdvint_timedelay.m`: time-varying internal delay.
+- `kdvint_ctedelay.m`: constant internal delay.
+- `MatA.m`: implicit KdV matrix with instantaneous damping.
+- `MatAz.m`: transport matrix for the time-varying memory variable.
+- `MatAz_cte.m`: constant-delay transport matrix.
+- `Cases1_int.m`, `Cases3int.m`: experiments from the recovered archive.
+
+The names `mat1`, `mat2`, `MatA`, `MatAz`, `Cases1`, etc. are retained intentionally because they correspond to the way the original numerical work was written.
+
+## Boundary delayed feedback
+
+The model is
 
 ```text
-D_x + D_x^+ D_x^+ D_x^-
+y_t+y_x+y_xxx+y*y_x=0,
+y(0,t)=y(L,t)=0,
+y_x(L,t)=alpha*y_x(0,t)+beta*y_x(0,t-tau(t)).
 ```
 
-is treated implicitly, while the nonlinear term is evaluated explicitly as
+The memory variable is
+
+```text
+z(rho,t)=y_x(0,t-tau(t)*rho),
+```
+
+and satisfies
+
+```text
+tau(t) z_t+(1-tau'(t)*rho) z_rho=0,
+z(0,t)=y_x(0,t).
+```
+
+For `kdv_time_delay.m`,
+
+```text
+tau(t)=d*(1.5+sin(t)).
+```
+
+The KdV linear part is treated implicitly with
+
+```text
+D_x + D_x^+ D_x^+ D_x^-,
+```
+
+and the nonlinear term is explicit:
 
 ```text
 y_i^n D_x^+ y_i^n.
 ```
 
-A time-varying delay is represented by a transport variable. In the boundary case,
+`mat1.m` contains the KdV matrix and the elimination of the right-boundary value using
 
 ```text
-z(rho,t) = y_x(0,t-tau(t)*rho),   0 < rho < 1,
+y_{Nx-1}=-alpha*y_1-beta*dx*z_{Nrho}.
 ```
 
-and in the internal case,
+`mat2.m` contains backward Euler in time and an upwind difference in `rho`:
 
 ```text
-z(x,rho,t) = y(x,t-tau(t)*rho).
+(1+q_k)z_k^{n+1}-q_k z_{k-1}^{n+1}=z_k^n,
+q_k=dt*(1-tau'(t_{n+1})rho_k)/(tau(t_{n+1})drho).
 ```
 
-In both cases the transformed delay equation is
+At the first memory point, `z_0^{n+1}=y_1^{n+1}/dx` is imposed directly in the coupled linear system.
+
+The discrete energy follows the energy of the paper,
 
 ```text
-tau(t) z_t + (1-dtau(t)*rho) z_rho = 0.
+E(t)=1/2 int_0^L |y|^2 dx
+    +|beta| tau(t)/2 int_0^1 |z|^2 d rho.
 ```
 
-It is discretized implicitly in time and by an upwind finite difference in `rho`. The transport equation and the KdV equation are solved in one coupled linear system at every time step, so the boundary condition at `rho=0` is imposed at the same new time level.
+## Internal delayed feedback
 
-The code computes the discrete counterparts of the energies used in the paper, including the square of the delay state, the quadrature factors, the factor `1/2`, the time-dependent factor `tau(t)`, and, in the internal case, the weight `xi(x)` only on the feedback region.
-
-## Boundary time-varying delay
-
-The main solver is
-
-```matlab
-[t,E] = kdv_time_delay(alpha,beta,d);
-```
-
-with
+The internal memory variable is
 
 ```text
-tau(t) = d*(1.5+sin(t)).
+z(x,rho,t)=y(x,t-tau(t)*rho),
 ```
 
-The initial data used in the paper are
+with the same transport equation
 
 ```text
-y0(x)   = 0.5*(1-cos(2*pi*x)),
-z0(rho) = -0.5*sin(2*pi*rho).
+tau(t) z_t+(1-tau'(t)*rho)z_rho=0,
+z(x,0,t)=y(x,t).
 ```
-
-Main scripts:
-
-- `boundary-delay/figure_delay_size.m`: influence of `d`, with `alpha=beta=0.1` and `d=0.1,0.7,1.3`.
-- `boundary-delay/figure_constant_vs_variable.m`: comparison of `tau(t)` with `tau_max=2.5d` and `tau_min=0.5d`.
-- `boundary-delay/figure_feedback_amplitude.m`: additional experiment from the recovered archive varying `beta`.
-
-The run with `d=1.3` is intentionally outside the hypothesis `sup_t dtau(t)<1`; the solver issues a warning when the transformed transport speed changes sign.
-
-For a constant boundary delay, use
-
-```matlab
-[t,E] = kdv_cte_delay(alpha,beta,h);
-```
-
-## Internal time-varying delay
 
 The numerical experiment uses
 
 ```text
-a(x)=2,  b(x)=1,  xi(x)=2.1   on (0,L/2),
+a(x)=2, b(x)=1, xi(x)=2.1 on (0,L/2),
 ```
 
-and zero feedbacks outside this interval. The initial data are
+and zero outside that region.
+
+The recovered code used central delay values `K=1,1.5,2` while the figure labels were `M=1.5,2,2.5`. To make the parameter agree with the figures, `kdvint_timedelay(M)` uses
 
 ```text
-y0(x)       = 1-cos(2*pi*x),
-z0(x,rho)   = (1-cos(2*pi*x))*cos(2*pi*rho).
+tau(t)=(M-0.5)+0.5*sin(t),
 ```
 
-The recovered archive called the three simulations with central delay values `K=1,1.5,2` but labeled the curves `M=1.5,2,2.5`. To remove this ambiguity, the corrected interface uses `M` as the maximum delay:
+so `M` is the maximum delay.
+
+`MatAz.m` imposes `z(x,0,t_{n+1})=y(x,t_{n+1})` in the same coupled solve. This removes the one-cell spatial shift and old-time inflow that were present in the recovered implementation.
+
+The memory part of the energy is integrated only on the feedback region and uses `xi=2.1`, as in the analytical model.
+
+## Corrections made to the recovered archive
+
+The corrected code keeps the original style but fixes the numerical inconsistencies found in the 2022 files:
+
+1. The nonlinear term contains the missing factor `1/dx` and is implemented as `y_i D_x^+y_i`.
+2. In `mat2.m`, the first transport row uses the coefficient at `rho_1=drho`; the recovered code accidentally used the final loop index `k=Nrho`.
+3. `tau` and `tau'` are evaluated consistently at the new implicit time level.
+4. The transformed initial histories are evaluated on the actual `rho` grid, without applying the delay a second time.
+5. Boundary energy uses the square of the memory norm, the quadrature factors, and the factor `1/2`.
+6. Constant- and variable-delay simulations use the same physical definition of energy.
+7. `Cases2.m` really uses `d=0.1` for the curve labelled `d=0.1`; the recovered script used `d=0.2` while displaying `0.1`.
+8. The internal memory is aligned with the same spatial point as the KdV unknown; the recovered code used the previous spatial cell.
+9. The internal condition `z(x,0,t)=y(x,t)` is imposed in the coupled linear system rather than by inserting the previous KdV state.
+10. The internal memory energy is restricted to the feedback support and uses `xi=2.1`.
+11. The spurious factor `2` that appeared after the first time step in the constant internal-delay energy is removed.
+12. The parameter used in the internal-delay experiment now agrees with the label `M` in the figure.
+
+## Running the experiments
+
+From `boundary-delay/`, for example:
 
 ```matlab
-[t,E] = kdvint_timedelay(M);
+Cases2
+Cases3
 ```
 
-with
-
-```text
-tau(t) = (M-0.5)+0.5*sin(t).
-```
-
-Thus `M=1.5,2,2.5` gives exactly the three delay functions used by the recovered simulations, while the parameter now agrees with the figure labels.
-
-Main scripts:
-
-- `internal-delay/figure_delay_size.m`: `M=1.5,2,2.5`.
-- `internal-delay/figure_constant_vs_variable.m`: comparison of `tau(t)=1+0.5*sin(t)` with the constant delays `1.5` and `0.5`.
-
-For a constant internal delay, use
+or directly
 
 ```matlab
-[t,E] = kdvint_ctedelay(h);
+[t,E]=kdv_time_delay(0.1,0.1,0.2);
 ```
 
-## Corrections with respect to the recovered archive
+From `internal-delay/`:
 
-The recovered codes contained several inconsistencies that affected the numerical scheme or the plotted energy. The corrected version:
+```matlab
+Cases1_int
+Cases3int
+```
 
-- uses the prescribed transformed initial histories directly, instead of evaluating them again at `-tau(0)*rho` or multiplying `rho` by the delay;
-- evaluates the nonlinear term as `y_i D_x^+ y_i`, including the missing `1/dx` factor;
-- fixes the first-row coefficient of the boundary transport matrix (the old code accidentally used the final loop index `k=Nrho` instead of `k=1`);
-- evaluates `tau` and `dtau` consistently at the new implicit time level;
-- uses the correct squared delay norm and the full quadrature factors in the boundary energy;
-- uses the same physical energy for constant- and variable-delay comparisons;
-- fixes the `d=0.1` boundary experiment, which was previously run with `d=0.2` but labeled `d=0.1`;
-- aligns the internal delayed state with the correct spatial grid point, removing the one-cell shift in the old code;
-- imposes `z(x,0,t_{n+1})=y(x,t_{n+1})` in the coupled solve instead of injecting the previous KdV state;
-- uses `xi=2.1` and integrates the internal memory energy only on the feedback support;
-- removes the spurious factor `2` that appeared in the constant internal-delay energy after the first time step;
-- resolves the mismatch between the internal parameter values and their figure labels.
-
-## Running the code
-
-Run each figure script from its own directory, or add both code directories to the MATLAB path. For a quick check from the repository root, run
+A short repository-level check is available with
 
 ```matlab
 smoke_test
 ```
 
-The grid parameters can be changed through an optional structure. For example,
-
-```matlab
-opts = struct('Nx',200,'Nrho',150,'Nt',500,'T',10);
-[t,E] = kdv_time_delay(0.1,0.1,0.2,opts);
-```
+The cleanup environment did not contain MATLAB/Octave, so the final MATLAB execution should still be run locally before regenerating publication-quality figures.
