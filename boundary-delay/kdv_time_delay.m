@@ -42,7 +42,7 @@ for n=1:Nt;
         error('tau(t) must stay positive')
     end
     if min(1-dtau(tnew)*rho)<=0 && warned==0;
-        warning('1-tau''(t)rho changes sign: this run is outside the upwind regime of the theorem')
+        warning('1-tau''(t)rho changes sign')
         warned=1;
     end
 
