@@ -40,7 +40,7 @@ Main files:
 The model is
 
 ```text
-y_t+y_x+y_xxx+y*y_x=0,
+y_t+y_x+y_xxx+y*y_x=0, 
 y(0,t)=y(L,t)=0,
 y_x(L,t)=alpha*y_x(0,t)+beta*y_x(0,t-tau(t)).
 ```
